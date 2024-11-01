@@ -1,5 +1,6 @@
 package org.example.webcrawler;
 
+
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.Jsoup;
@@ -26,6 +27,5 @@ public class WebPageFetcher {
         }
 
         return new Document("url");
-
     }
 }

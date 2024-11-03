@@ -11,7 +11,7 @@ import java.io.IOException;
 @Log4j2
 public class WebPageFetcher {
 
-    public Document fetchWebPage(String url) throws IOException {
+    public Document fetchWebPage(String url) {
 //        does some network calls
 //        fetches the raw content of a page using url
         try {
@@ -26,6 +26,6 @@ public class WebPageFetcher {
             log.error("Exception occured while fetching the page: {}", e.getMessage());
         }
 
-        return new Document("url");
+        return null;
     }
 }

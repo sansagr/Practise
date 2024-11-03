@@ -6,12 +6,13 @@ import org.example.webcrawler.repositories.WebpageStore;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.rmi.server.ExportException;
 import java.util.*;
 
 @Log4j2
 public class WebsiteCrawler {
 
-    private final List<String> listOfUrls = new ArrayList<>(List.of("https://www.wikipedia.com/", "https://medium.com", "https://www.reddit.com/"));
+    private final List<String>  listOfUrls = new ArrayList<>(List.of("https://www.wikipedia.com/", "https://medium.com", "https://www.reddit.com/"));
     private final WebpageStore webpageStore;
     private boolean isPaused;
     private final WebUrlSet webUrlSet;
@@ -23,7 +24,7 @@ public class WebsiteCrawler {
 
     }
 
-    public void startOrResumeCrawl() throws IOException {
+    public void startOrResumeCrawl() {
         listOfUrls.parallelStream().forEach(this::crawlUrl);
     }
 
@@ -67,12 +68,12 @@ public class WebsiteCrawler {
                 log.info("the number of pages in hashset: {}", webUrlSet.size());
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace(); // Handle the exception (log it, rethrow, etc.)
         }
     }
 
-    public void pauseCrawl() throws IOException {
+    public void pauseCrawl() {
         isPaused = true;
     }
 

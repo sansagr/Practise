@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SnakeAndladderDemo {
-    //    TODO: implement the game loop here
     public static void main(String[] args) {
 
         SnakeAndLadderGenerator snakeAndLadderGenerator = new SnakeAndLadderGenerator();
-        HashMap<Integer, Integer> snakesAndLadders = snakeAndLadderGenerator.generateSnakesAndLadders(5, 5);
+        HashMap<Integer, Integer> snakesAndLadders = snakeAndLadderGenerator.generateSnakesAndLadders(5, 6);
 
         BoardGenerator boardGenerator = new BoardGenerator();
         Board board = boardGenerator.generateBoard(snakesAndLadders);

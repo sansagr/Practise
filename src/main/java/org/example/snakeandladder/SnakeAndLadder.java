@@ -6,9 +6,11 @@ public class SnakeAndLadder {
 
     public Player startGame(List<Player> players, Board board, Dice dice, Mover mover) {
 //  TODO: Takes the list of players, Board, Dice, Mover and starts the game and manages which player will take turn
+
         int numberOfPlayers = players.size();
         int currentPlayerIndex = 0;
         Player winner = null;
+
         while (players.get(currentPlayerIndex).getPosition() < 99) {
             int stepsToMove = dice.roll();
             Player currentPlayer = players.get(currentPlayerIndex);

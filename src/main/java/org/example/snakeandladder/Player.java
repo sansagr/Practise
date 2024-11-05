@@ -12,4 +12,27 @@ public class Player {
         this.position = position;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 }

@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public class Cell {
     public final int number;
-    public final Optional<Integer> destination;
+    public final int destination;
 
-    public Cell(int number, Optional<Integer> destination) {
+    public Cell(int number, int destination) {
         this.number = number;
         this.destination = destination;
     }

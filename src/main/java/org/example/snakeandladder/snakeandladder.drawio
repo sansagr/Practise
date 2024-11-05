@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="24.8.3">
   <diagram name="Page-1" id="gJGjKiC-9Y5nh5nvvPQi">
-    <mxGraphModel dx="1360" dy="860" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1224" dy="774" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -58,7 +58,7 @@
         <mxCell id="1zVaNxWn8gT_nWEmGQUo-31" value="BoardGenerator" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=20;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
           <mxGeometry x="680" y="274.5" width="240" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="1zVaNxWn8gT_nWEmGQUo-33" value="generateBoard(int numsLadder, int numsSnake): Board" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="1zVaNxWn8gT_nWEmGQUo-31">
+        <mxCell id="1zVaNxWn8gT_nWEmGQUo-33" value="generateBoard(Hashma[ snakesAndLadders): Board" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="1zVaNxWn8gT_nWEmGQUo-31">
           <mxGeometry y="20" width="240" height="35" as="geometry" />
         </mxCell>
         <mxCell id="1zVaNxWn8gT_nWEmGQUo-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.988;entryY=0.681;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="1zVaNxWn8gT_nWEmGQUo-2">
@@ -71,6 +71,15 @@
         </mxCell>
         <mxCell id="1zVaNxWn8gT_nWEmGQUo-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.735;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="1zVaNxWn8gT_nWEmGQUo-8" target="1zVaNxWn8gT_nWEmGQUo-2">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1zVaNxWn8gT_nWEmGQUo-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="1zVaNxWn8gT_nWEmGQUo-38" target="1zVaNxWn8gT_nWEmGQUo-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1zVaNxWn8gT_nWEmGQUo-38" value="SnakesAndLaddersGenerator" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=20;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="810" y="120" width="240" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="1zVaNxWn8gT_nWEmGQUo-39" value="generateSnakesAndLadders(int numsLadder, int numsSnake): HashMap" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;" vertex="1" parent="1zVaNxWn8gT_nWEmGQUo-38">
+          <mxGeometry y="20" width="240" height="35" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

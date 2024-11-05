@@ -16,7 +16,10 @@ public class SnakeAndLadder {
             Player currentPlayer = players.get(currentPlayerIndex);
             int playerPreviousPosition = currentPlayer.getPosition();
             System.out.println("Player: " + currentPlayer.getColour() + " rolled: " + stepsToMove);
+
+//          Updates the player's position
             mover.movePlayer(currentPlayer, stepsToMove, board);
+
             System.out.println("Player: " + currentPlayer.getColour() + " moved from position: " + playerPreviousPosition + " to position: " + currentPlayer.getPosition());
             if (currentPlayer.getPosition() == 99) {
                 winner = currentPlayer;

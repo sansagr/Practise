@@ -33,12 +33,12 @@ public class Splitwise {
 
 
         expenseService.addExpense("User2", 300, 2, users3, ExpenseType.EXACT, List.of(100,200));
-        expenseService.showBalance("User2");
+//        expenseService.showBalance("User2");
 
 
         expenseService.addExpense("User3", 400, 2, users4, ExpenseType.PERCENT, List.of(40,60));
         expenseService.addExpense("User2", 10000, 4, users, ExpenseType.EQUAL, List.of(1));
-//        expenseService.showAllBalances();
+        expenseService.showAllBalances();
 
     }
 }

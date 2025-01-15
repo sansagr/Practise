@@ -5,6 +5,7 @@ import org.example.deckofcards.models.CardValue;
 import org.example.deckofcards.repositories.CardsRepository;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlackJackHandler {
 
@@ -39,89 +40,107 @@ public class BlackJackHandler {
     }
 
     private void gameLoop(int noOfPlayers){
-        int playerTurn;
         int counter = 0;
-        int standCount = 0;
+        AtomicInteger standCount = new AtomicInteger(0);
         while (true) {
-            playerTurn = counter % noOfPlayers;
-            if (playerTurn == noOfPlayers - 1) {
+            int currentPlayer = counter % noOfPlayers;
 
-                List<Card> cards = playerHands.get(playerTurn);
-                int cardsTotal = getHandsTotal(cards);
-                System.out.println("Dealer " + playerTurn + " Total so far " + cardsTotal);
-
-                if (cardsTotal == 21) {
-                    System.out.println("House wins");
-                    break;
-                } else if (cardsTotal > 21) {
-                    System.out.println("House looses");
-                    break;
-
-                } else if (standCount == playerHands.size() - 1) {
-                    int winner = getHighestCountPlayer();
-                    System.out.println(winner + " Congrats you win!");
-                    break;
-                } else if (cardsTotal > 16) {
-                    counter += 1;
-                    continue;
-                } else {
-                    Card card = cardsRepository.getTop();
-                    System.out.println("dealer " + "is dealt " + card.getCardSuitAndValue());
-                    cards.add(card);
-                    cardsTotal = getHandsTotal(cards);
-                    if (cardsTotal > 21) {
-                        System.out.println("House loses");
-                        break;
-                    } else if (cardsTotal == 21) {
-                        System.out.println("House wins");
-                    }
-                }
-                standCount = 0;
-            } else {
-                if (!playerHands.containsKey(playerTurn)) {
-                    counter += 1;
-                    continue;
-                }
-                int playerTotal = getHandsTotal(playerHands.get(playerTurn));
-                System.out.println("player " + playerTurn + " Total so far " + playerTotal);
-                if (playerTotal == 21) {
-                    System.out.println("Congrats you win!");
-                    break;
-                } else if (playerTotal > 21) {
-                    System.out.println(playerTurn + " Your ass is sooo busted!!!");
-                    playerHands.remove(playerTurn);
-                    counter += 1;
-                    continue;
-                }
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("player " + playerTurn + " Hit or Stand ");
-                String input = scanner.nextLine();
-                if (input.equals("Hit")) {
-                    List<Card> playerCards = playerHands.get(playerTurn);
-                    Card card = cardsRepository.getTop();
-                    playerCards.add(card);
-                    System.out.println("Player " + playerTurn + " is dealt " + card.getCardSuitAndValue() + " Totalling to " + getHandsTotal(playerCards));
-                    playerHands.put(playerTurn, playerCards);
-                    int playerCardTotal = getHandsTotal(playerCards);
-                    if (playerCardTotal == 21) {
-                        System.out.println("Congrats you win!");
-                        break;
-                    } else if (playerCardTotal > 21) {
-                        System.out.println(playerTurn + " Your ass is sooo busted!!!");
-                        playerHands.remove(playerTurn);
-                        counter += 1;
-                        continue;
-                    }
-                } else if (input.equals("Stand")) {
-                    counter += 1;
-                    standCount += 1;
-                    continue;
-                } else {
-                    System.out.println("Invalid input from user, try again");
-                    continue;
-                }
+            // Dealer logic
+            if (currentPlayer == noOfPlayers - 1) {
+                if (processDealerTurn(currentPlayer, standCount.get())) break;
+                standCount.set(0);
             }
-            counter += 1;
+            // Player logic
+            else {
+                if (processPlayerTurn(currentPlayer, standCount)) break;
+            }
+            counter++;
+        }
+    }
+
+    private boolean processDealerTurn(int playerTurn, int standCount){
+        List<Card> dealerCards = playerHands.get(playerTurn);
+        int cardsTotal = getHandsTotal(dealerCards);
+        System.out.println("Dealer " + playerTurn + " Total so far " + cardsTotal);
+        if (cardsTotal == 21) {
+            System.out.println("House wins");
+            return true;
+        } else if (cardsTotal > 21) {
+            System.out.println("House looses");
+            return false;
+        } else if (standCount == playerHands.size() - 1) {
+            int winner = getHighestCountPlayer();
+            System.out.println(winner + " Congrats you win!");
+        } else if (cardsTotal > 16) {
+            return false;
+        } else {
+            dealCardToPlayer(playerTurn, "Dealer");
+            cardsTotal = getHandsTotal(dealerCards);
+            if (cardsTotal > 21) {
+                System.out.println("House loses");
+                return false;
+            } else if (cardsTotal == 21) {
+                System.out.println("House wins");
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean processPlayerTurn(int playerTurn, AtomicInteger standCount){
+        if (!playerHands.containsKey(playerTurn)) {
+            return false;
+        }
+        List<Card> playerCards = playerHands.get(playerTurn);
+        int playerTotal = getHandsTotal(playerHands.get(playerTurn));
+        System.out.println("player " + playerTurn + " Total so far " + playerTotal);
+        if (playerTotal == 21) {
+            System.out.println("Congrats you win!");
+            return true;
+        } else if (playerTotal > 21) {
+            System.out.println("Player " + playerTurn + " busted!");
+            playerHands.remove(playerTurn);
+            return false;
+        }
+        String playerAction = getPlayerAction(playerTurn);
+        if (playerAction.equals("Hit")){
+            dealCardToPlayer(playerTurn, "Player " + playerTurn);
+            int newTotal = getHandsTotal(playerCards);
+            if (newTotal == 21) {
+                System.out.println("Congrats, Player " + playerTurn + " wins!");
+                return true;
+            } else if (newTotal > 21) {
+                System.out.println("Player " + playerTurn + " busted!");
+                playerHands.remove(playerTurn);
+                return false;
+            }
+        } else if (playerAction.equals("Stand")) {
+            standCount.incrementAndGet();
+            if (standCount.get() ==  playerHands.size() - 1){
+                int winner = getHighestCountPlayer();
+                System.out.println(winner + " Congrats you win!");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void dealCardToPlayer(int playerTurn, String name){
+        List<Card> cards = playerHands.get(playerTurn);
+        Card card = cardsRepository.getTop();
+        cards.add(card);
+        System.out.println(name + " is dealt " + card.getCardSuitAndValue() +
+                " Totalling to " + getHandsTotal(cards));
+    }
+
+    private String getPlayerAction(int playerTurn){
+        Scanner scanner = new Scanner(System.in);
+        while(true){
+            System.out.println("player " + playerTurn + " Hit or Stand ");
+            String input = scanner.nextLine();
+            if (input.equals("Hit") || input.equals("Stand")){
+                return input;
+            }
+            System.out.println("Invalid input, try again");
 
         }
     }

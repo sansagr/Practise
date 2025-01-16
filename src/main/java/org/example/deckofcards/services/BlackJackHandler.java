@@ -1,7 +1,6 @@
 package org.example.deckofcards.services;
 
-import org.example.deckofcards.models.Card;
-import org.example.deckofcards.models.CardValue;
+import org.example.deckofcards.models.*;
 import org.example.deckofcards.repositories.CardsRepository;
 
 import java.util.*;
@@ -10,11 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BlackJackHandler {
 
     public CardsRepository cardsRepository;
-    public Map<Integer, List<Card>> playerHands;
+//    public Map<Integer, List<Card>> playerHands;
+    public Dealer dealer = new Dealer();
+    public List<Player> players = new ArrayList<>();
 
     public BlackJackHandler(CardsRepository cardsRepository) {
         this.cardsRepository = cardsRepository;
-        this.playerHands = new HashMap<>();
+//        this.playerHands = new HashMap<>();
     }
 
     public void startBlackJack(int noOfPlayers) {
@@ -25,16 +26,22 @@ public class BlackJackHandler {
     }
 //    Starts the map and set initial states of the game
     private void gameInitializer(int noOfPlayers){
-        for (int j = 0; j < noOfPlayers; j++) {
-            playerHands.putIfAbsent(j, new ArrayList<>());
+        for (int j = 0; j < noOfPlayers-1; j++) {
+            players.add(new Player(j));
         }
 
-        for (int i = 0; i < 2 * noOfPlayers; i++) {
+        for (int i = 0; i < 2 * (noOfPlayers); i++) {
             int playerId = i % noOfPlayers;
-            List<Card> playerCards = playerHands.get(playerId);
+            List<Card> playerCards = new ArrayList<>();
+            if (playerId == noOfPlayers -1){
+                playerCards = dealer.getHand();
+            }
+            else{
+                playerCards = players.get(playerId).getHand();
+            }
             Card card = cardsRepository.getTop();
             playerCards.add(card);
-            playerHands.put(playerId, playerCards);
+//            playerHands.put(playerId, playerCards);
             System.out.println("Player " + playerId + " is dealt " + card.getCardSuitAndValue() + " Totalling to " + getHandsTotal(playerCards));
         }
     }
@@ -43,79 +50,76 @@ public class BlackJackHandler {
         int counter = 0;
         AtomicInteger standCount = new AtomicInteger(0);
         while (true) {
-            int currentPlayer = counter % noOfPlayers;
+            int currentPlayer = counter % (players.size() + 1);
 
             // Dealer logic
-            if (currentPlayer == noOfPlayers - 1) {
-                if (processDealerTurn(currentPlayer, standCount.get())) break;
+            if (currentPlayer == players.size()) {
+                if (processDealerTurn(standCount.get())) break;
                 standCount.set(0);
             }
             // Player logic
             else {
-                if (processPlayerTurn(currentPlayer, standCount)) break;
+                if (processPlayerTurn(players.get(currentPlayer), standCount)) break;
             }
             counter++;
         }
     }
 
-    private boolean processDealerTurn(int playerTurn, int standCount){
-        List<Card> dealerCards = playerHands.get(playerTurn);
+    private boolean processDealerTurn(int standCount){
+        List<Card> dealerCards = dealer.getHand();
         int cardsTotal = getHandsTotal(dealerCards);
-        System.out.println("Dealer " + playerTurn + " Total so far " + cardsTotal);
-        if (cardsTotal == 21) {
+        System.out.println("Dealer "  + "Total so far " + cardsTotal);
+        if (cardsTotal == Constants.BLACKJACK_LIMIT) {
             System.out.println("House wins");
             return true;
-        } else if (cardsTotal > 21) {
+        } else if (cardsTotal > Constants.BLACKJACK_LIMIT) {
             System.out.println("House looses");
             return false;
-        } else if (standCount == playerHands.size() - 1) {
+        } else if (standCount == players.size() ) {
             int winner = getHighestCountPlayer();
             System.out.println(winner + " Congrats you win!");
-        } else if (cardsTotal > 16) {
+        } else if (cardsTotal > Constants.DEALER_STAND_THRESHOLD) {
             return false;
         } else {
-            dealCardToPlayer(playerTurn, "Dealer");
-            cardsTotal = getHandsTotal(dealerCards);
-            if (cardsTotal > 21) {
+            dealCardToPlayer(dealer, "Dealer");
+            cardsTotal = dealer.getTotals();
+            if (cardsTotal > Constants.BLACKJACK_LIMIT) {
                 System.out.println("House loses");
                 return false;
-            } else if (cardsTotal == 21) {
+            } else if (cardsTotal == Constants.BLACKJACK_LIMIT) {
                 System.out.println("House wins");
                 return true;
             }
         }
         return false;
     }
-    private boolean processPlayerTurn(int playerTurn, AtomicInteger standCount){
-        if (!playerHands.containsKey(playerTurn)) {
-            return false;
-        }
-        List<Card> playerCards = playerHands.get(playerTurn);
-        int playerTotal = getHandsTotal(playerHands.get(playerTurn));
-        System.out.println("player " + playerTurn + " Total so far " + playerTotal);
-        if (playerTotal == 21) {
+    private boolean processPlayerTurn(Player player, AtomicInteger standCount){
+        List<Card> playerCards = player.getHand();
+        int playerTotal = getHandsTotal(playerCards);
+        System.out.println("player " + player.getPlayerId() + " Total so far " + playerTotal);
+        if (playerTotal == Constants.BLACKJACK_LIMIT) {
             System.out.println("Congrats you win!");
             return true;
-        } else if (playerTotal > 21) {
-            System.out.println("Player " + playerTurn + " busted!");
-            playerHands.remove(playerTurn);
+        } else if (playerTotal > Constants.BLACKJACK_LIMIT) {
+            System.out.println("Player " + player.getPlayerId() + " busted!");
+            players.remove(player);
             return false;
         }
-        String playerAction = getPlayerAction(playerTurn);
+        String playerAction = getPlayerAction(player.getPlayerId());
         if (playerAction.equals("Hit")){
-            dealCardToPlayer(playerTurn, "Player " + playerTurn);
+            dealCardToPlayer(player, "Player " + player.getPlayerId());
             int newTotal = getHandsTotal(playerCards);
-            if (newTotal == 21) {
-                System.out.println("Congrats, Player " + playerTurn + " wins!");
+            if (newTotal == Constants.BLACKJACK_LIMIT) {
+                System.out.println("Congrats, Player " + player.getPlayerId() + " wins!");
                 return true;
-            } else if (newTotal > 21) {
-                System.out.println("Player " + playerTurn + " busted!");
-                playerHands.remove(playerTurn);
+            } else if (newTotal > Constants.BLACKJACK_LIMIT) {
+                System.out.println("Player " + player.getPlayerId() + " busted!");
+                players.remove(player);
                 return false;
             }
         } else if (playerAction.equals("Stand")) {
             standCount.incrementAndGet();
-            if (standCount.get() ==  playerHands.size() - 1){
+            if (standCount.get() ==  players.size()){
                 int winner = getHighestCountPlayer();
                 System.out.println(winner + " Congrats you win!");
                 return true;
@@ -124,8 +128,8 @@ public class BlackJackHandler {
         return false;
     }
 
-    private void dealCardToPlayer(int playerTurn, String name){
-        List<Card> cards = playerHands.get(playerTurn);
+    private void dealCardToPlayer(Participant participant, String name){
+        List<Card> cards = participant.getHand();
         Card card = cardsRepository.getTop();
         cards.add(card);
         System.out.println(name + " is dealt " + card.getCardSuitAndValue() +
@@ -164,29 +168,17 @@ public class BlackJackHandler {
         return cardsTotal;
     }
 
-    private String checkHandStatus(int playerId) {
-        List<Card> cards = playerHands.get(playerId);
-        int getTotals = getHandsTotal(cards);
-        if (getTotals > 21) {
-            return "Busted";
-        } else if (getTotals == 21) {
-            return "Winner";
-        } else {
-            return "notBusted";
-        }
-    }
-
     private int getHighestCountPlayer() {
         int maxSum = 0;
         int playerId = -1;
-        for (int player : playerHands.keySet()) {
+        for (Player player : players) {
             int sum = 0;
-            for (Card card : playerHands.get(player)) {
+            for (Card card : player.getHand()) {
                 sum += card.getValue().getValue();
             }
             if (sum > maxSum) {
                 maxSum = sum;
-                playerId = player;
+                playerId = player.getPlayerId();
             }
         }
 
